@@ -8,7 +8,7 @@
  */
 (function () {
 	'use strict';
-	var V = 'af24bf7d3b77';
+	var V = 'c52fb77234a6';
 	var IDS = ["eag-inline-wasm-br", "eag-inline-mesh-wasm-br", "eag-inline-server-wasm-br", "eag-inline-assets", "eag-inline-sounds"];
 	var CACHE = 'radio-payload-' + V;
 	var total = 54548267, done = 0;
@@ -314,7 +314,7 @@ vNCw0YbQuNGP0JjQvdGE0L7RgNC80LDRhtC40Y/QoNC10YHQv9GD0LHQu9C40LrQuNC60L7Qu9C40YfQ
   ], { type: "text/javascript" }));
   var serverAssetNode = document.getElementById("eag-inline-assets");
   window.__eaglerWasmServerWorkerBootstrapURL = URL.createObjectURL(new Blob([
-    "self.__riseAssetURL=self.__riseAssetURL||" + JSON.stringify(new URL("payload/eag-inline-assets.bin?v=af24bf7d3b77", location.href).href) + ";\n",
+    "self.__riseAssetURL=self.__riseAssetURL||" + JSON.stringify(new URL("payload/eag-inline-assets.bin?v=c52fb77234a6", location.href).href) + ";\n",
     "(function () {\n  \"use strict\";\n  var originalFetch = self.fetch.bind(self);\n  var OriginalXHR = self.XMLHttpRequest;\n  var encoded = `",
     "",
     "`;\n  var assetBuffer = null;\n  function decodeAsset() {\n    if (assetBuffer) return assetBuffer;\n    if (self.__riseAssetURL) { var rx = new OriginalXHR(); rx.open('GET', self.__riseAssetURL, false); rx.responseType = 'arraybuffer'; rx.send(); if (rx.status !== 200) throw new Error('Rise: asset download failed ' + rx.status); assetBuffer = rx.response; encoded = ''; return assetBuffer; }\n    var size = 4815610;\n    var out = new Uint8Array(size);\n    var offset = 0;\n    var start = 0;\n    while (start < encoded.length) {\n      while (start < encoded.length && encoded.charCodeAt(start) <= 32) ++start;\n      if (start >= encoded.length) break;\n      var end = encoded.indexOf(\"\\n\", start);\n      if (end < 0) end = encoded.length;\n      while (end > start && encoded.charCodeAt(end - 1) <= 32) --end;\n      var binary = atob(encoded.slice(start, end));\n      for (var i = 0; i < binary.length; ++i) out[offset + i] = binary.charCodeAt(i);\n      offset += binary.length;\n      start = end + 1;\n    }\n    encoded = \"\";\n    if (offset !== size) throw new Error(\"inline server asset size mismatch\");\n    assetBuffer = out.buffer;\n    return assetBuffer;\n  }\n  self.fetch = function (input, init) {\n    var url = typeof input === \"string\" ? input : (input && input.url) || String(input);\n    if (url.indexOf(\"eagler-inline-payload://assets.epk\") !== 0) {\n      return originalFetch(input, init);\n    }\n    return Promise.resolve(new Response(decodeAsset(), {\n      status: 200,\n      headers: { \"Content-Type\": \"application/octet-stream\" }\n    }));\n  };\n  self.XMLHttpRequest = function () {\n    var delegate = null;\n    var listeners = Object.create(null);\n    var inline = false;\n    var url = \"\";\n    this.status = 0;\n    this.response = null;\n    this.responseType = \"\";\n    this.addEventListener = function (type, listener) {\n      listeners[type] = listener;\n      if (delegate) delegate.addEventListener(type, listener);\n    };\n    this.open = function (method, nextURL, async) {\n      url = String(nextURL);\n      inline = url.indexOf(\"eagler-inline-payload://assets.epk\") === 0;\n      if (!inline) {\n        delegate = new OriginalXHR();\n        delegate.responseType = this.responseType;\n        for (var type in listeners) delegate.addEventListener(type, listeners[type]);\n        delegate.open(method, nextURL, async);\n      }\n    };\n    this.send = function (body) {\n      if (!inline) {\n        delegate.responseType = this.responseType;\n        delegate.send(body);\n        return;\n      }\n      var selfXHR = this;\n      setTimeout(function () {\n        try {\n          selfXHR.status = 200;\n          selfXHR.response = decodeAsset();\n          if (listeners.load) listeners.load.call(selfXHR, { target: selfXHR });\n        } catch (ex) {\n          if (listeners.error) listeners.error.call(selfXHR, { target: selfXHR, error: ex });\n        }\n      }, 0);\n    };\n  };\n})();\n",
@@ -983,7 +983,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 		zoom: true, zoomLevel: 3, fullbright: false, fullbrightOn: false, toggleSprint: false, toggleSneak: false,
 		lowFire: false, clearWater: false, noPumpkin: false, entityCull: false, clearLag: false,
 		crosshairSize: 1, fullbrightStrength: 'medium', fpsCorner: 'left', clearLagMinutes: 3, cullDistance: 0.5,
-		skins: {}, shader: false, shaderStyle: 'vibrant', glowOres: false, glint: false, glintColor: 'red', cleanGlass: false,
+		skins: {}, playerSkin: 'alastor', shader: false, shaderStyle: 'vibrant', glowOres: false, glint: false, glintColor: 'red', cleanGlass: false,
 		noHurtTilt: false, noFovFx: false, noWobble: false, noLightning: false,
 		batterySaver: true, batteryCap: lowEnd ? 30 : 0
 	};
@@ -1070,6 +1070,9 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 		if (mods.cleanGlass) w.push('rise_clean_glass');
 		var sk = mods.skins || {};
 		Object.keys(sk).forEach(function (g) { if (sk[g]) w.push('rise_skin_' + sk[g]); });
+		// The Alastor texture replaces the classic wide-arm Steve fallback skin.
+		// A skin supplied by a multiplayer server can still take precedence.
+		if (mods.playerSkin === 'alastor') w.push('rise_player_alastor');
 		if (mods.glint) w.push('rise_glint_' + mods.glintColor);
 		return w.filter(function (p) { return PACKS[p]; });
 	}
@@ -2108,6 +2111,21 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 		setValue({ mod: 'skins', restart: true }, cur);
 	}
 	function renderSkins(list) {
+		list.appendChild(el('div', 'gh', 'PLAYER SKIN'));
+		var playerPreview = el('div', 'hint');
+		playerPreview.style.cssText = 'display:flex;align-items:center;gap:14px;padding:10px 12px 12px';
+		var playerTexture = SKINS.packs.rise_player_alastor['assets/minecraft/textures/entity/player/wide/steve.png'];
+		var playerImage = img(playerTexture, 96);
+		playerImage.style.cssText = 'width:96px;height:96px;image-rendering:pixelated;border:1px solid #9b1c2a;background:#0b0608';
+		playerPreview.appendChild(playerImage);
+		var playerCopy = el('div');
+		playerCopy.appendChild(el('div', null, 'Alastor — Steve model'));
+		playerCopy.appendChild(el('div', null, '64×64 skin · classic wide arms'));
+		playerCopy.appendChild(el('div', null, 'Server-provided player skins may override this fallback texture.'));
+		playerCopy.style.cssText = 'display:flex;flex-direction:column;gap:6px;line-height:1.3;color:#b99aa1;font-size:12px';
+		playerPreview.appendChild(playerCopy);
+		list.appendChild(playerPreview);
+		list.appendChild(renderRow({ mod: 'playerSkin', label: 'Player Skin', type: 'cycle', values: [['alastor', 'Alastor (Default)'], ['steve', 'Default Steve']], desc: 'Uses the selected skin as the classic wide-arm Steve fallback. Changes apply after restart.', restart: true }));
 		var bar = el('div', 'sbar');
 		var q = el('input'); q.placeholder = 'Search skins...'; q.value = skinFilter.q; q.spellcheck = false;
 		bar.appendChild(q);
