@@ -8,7 +8,7 @@
  */
 (function () {
 	'use strict';
-	var V = 'd26fe19917c1';
+	var V = '0da378f35a9c';
 	var IDS = ["eag-inline-wasm-br", "eag-inline-mesh-wasm-br", "eag-inline-server-wasm-br", "eag-inline-assets", "eag-inline-sounds"];
 	var CACHE = 'radio-payload-' + V;
 	var total = 54549819, done = 0;
@@ -314,7 +314,7 @@ vNCw0YbQuNGP0JjQvdGE0L7RgNC80LDRhtC40Y/QoNC10YHQv9GD0LHQu9C40LrQuNC60L7Qu9C40YfQ
   ], { type: "text/javascript" }));
   var serverAssetNode = document.getElementById("eag-inline-assets");
   window.__eaglerWasmServerWorkerBootstrapURL = URL.createObjectURL(new Blob([
-    "self.__riseAssetURL=self.__riseAssetURL||" + JSON.stringify(new URL("payload/eag-inline-assets.bin?v=d26fe19917c1", location.href).href) + ";\n",
+    "self.__riseAssetURL=self.__riseAssetURL||" + JSON.stringify(new URL("payload/eag-inline-assets.bin?v=0da378f35a9c", location.href).href) + ";\n",
     "(function () {\n  \"use strict\";\n  var originalFetch = self.fetch.bind(self);\n  var OriginalXHR = self.XMLHttpRequest;\n  var encoded = `",
     "",
     "`;\n  var assetBuffer = null;\n  function decodeAsset() {\n    if (assetBuffer) return assetBuffer;\n    if (self.__riseAssetURL) { var rx = new OriginalXHR(); rx.open('GET', self.__riseAssetURL, false); rx.responseType = 'arraybuffer'; rx.send(); if (rx.status !== 200) throw new Error('Rise: asset download failed ' + rx.status); assetBuffer = rx.response; encoded = ''; return assetBuffer; }\n    var size = 4817162;\n    var out = new Uint8Array(size);\n    var offset = 0;\n    var start = 0;\n    while (start < encoded.length) {\n      while (start < encoded.length && encoded.charCodeAt(start) <= 32) ++start;\n      if (start >= encoded.length) break;\n      var end = encoded.indexOf(\"\\n\", start);\n      if (end < 0) end = encoded.length;\n      while (end > start && encoded.charCodeAt(end - 1) <= 32) --end;\n      var binary = atob(encoded.slice(start, end));\n      for (var i = 0; i < binary.length; ++i) out[offset + i] = binary.charCodeAt(i);\n      offset += binary.length;\n      start = end + 1;\n    }\n    encoded = \"\";\n    if (offset !== size) throw new Error(\"inline server asset size mismatch\");\n    assetBuffer = out.buffer;\n    return assetBuffer;\n  }\n  self.fetch = function (input, init) {\n    var url = typeof input === \"string\" ? input : (input && input.url) || String(input);\n    if (url.indexOf(\"eagler-inline-payload://assets.epk\") !== 0) {\n      return originalFetch(input, init);\n    }\n    return Promise.resolve(new Response(decodeAsset(), {\n      status: 200,\n      headers: { \"Content-Type\": \"application/octet-stream\" }\n    }));\n  };\n  self.XMLHttpRequest = function () {\n    var delegate = null;\n    var listeners = Object.create(null);\n    var inline = false;\n    var url = \"\";\n    this.status = 0;\n    this.response = null;\n    this.responseType = \"\";\n    this.addEventListener = function (type, listener) {\n      listeners[type] = listener;\n      if (delegate) delegate.addEventListener(type, listener);\n    };\n    this.open = function (method, nextURL, async) {\n      url = String(nextURL);\n      inline = url.indexOf(\"eagler-inline-payload://assets.epk\") === 0;\n      if (!inline) {\n        delegate = new OriginalXHR();\n        delegate.responseType = this.responseType;\n        for (var type in listeners) delegate.addEventListener(type, listeners[type]);\n        delegate.open(method, nextURL, async);\n      }\n    };\n    this.send = function (body) {\n      if (!inline) {\n        delegate.responseType = this.responseType;\n        delegate.send(body);\n        return;\n      }\n      var selfXHR = this;\n      setTimeout(function () {\n        try {\n          selfXHR.status = 200;\n          selfXHR.response = decodeAsset();\n          if (listeners.load) listeners.load.call(selfXHR, { target: selfXHR });\n        } catch (ex) {\n          if (listeners.error) listeners.error.call(selfXHR, { target: selfXHR, error: ex });\n        }\n      }, 0);\n    };\n  };\n})();\n",
@@ -1962,12 +1962,12 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 			t.onclick = function () { page[which] = p.id; tabs.querySelectorAll('.tab').forEach(function (x) { x.classList.toggle('on', x === t); }); renderList(); };
 			tabs.appendChild(t);
 		});
-		var note = el('div', 'note', 'Some changes apply after a restart. Save & quit your world first.');
+		var note = el('div', 'note', 'Changes are applied to the running client when you press Apply.');
 		var bar = el('div', 'bar');
 		var apply = el('div', 'btn', 'Apply');
 		var done = el('div', 'btn', 'Done');
-		apply.onclick = function () { if (needsRestart()) commit(true); else { commit(false); toast('Applied'); } };
-		done.onclick = function () { commit(false); if (needsRestart()) toast('Saved: applies next time you open Rise'); closePanel(); };
+		apply.onclick = function () { commit(false); toast('Applied'); };
+		done.onclick = function () { commit(false); closePanel(); };
 		bar.appendChild(apply); bar.appendChild(done);
 		scrim.appendChild(tabs); scrim.appendChild(list); scrim.appendChild(info); scrim.appendChild(note); scrim.appendChild(bar);
 		root.appendChild(scrim);
@@ -1977,8 +1977,8 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 	function refresh() {
 		if (!scrim) return;
 		var r = needsRestart();
-		scrim._note.classList.toggle('show', r);
-		scrim._apply.textContent = r ? 'Apply & Restart' : 'Apply';
+		scrim._note.classList.toggle('show', false);
+		scrim._apply.textContent = 'Apply';
 		scrim._list.querySelectorAll('.row').forEach(function (row) { if (row._it && (row._it.key || row._it.rise || row._it.mod)) row.classList.toggle('mod', isModified(row._it)); });
 	}
 	function showInfo(it, text) {
@@ -2067,7 +2067,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 					for (var key in vals) staged[key] = vals[key];
 					if (pr[0] === 'chromebook') { stagedRise.chromebook = true; stagedRise.chunkCap = true; cfg.hidpi = false; }
 					else { stagedRise.chromebook = false; stagedRise.chunkCap = false; if (pr[0] === 'quality') cfg.hidpi = true; }
-					saveCfg(); applyScale(); renderList(); toast(pr[1] + ' preset ready: press Apply & Restart');
+					saveCfg(); applyScale(); renderList(); toast(pr[1] + ' preset ready: press Apply');
 				};
 				right.appendChild(pb);
 			});
@@ -2118,7 +2118,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 			bar.appendChild(ch);
 		});
 		list.appendChild(bar);
-		list.appendChild(el('div', 'hint', 'Click a skin to wear it (one per item), click again to take it off. Right-click for a closer look. Skins only change how things look. Press Apply & Restart when you are done.'));
+		list.appendChild(el('div', 'hint', 'Click a skin to wear it (one per item), click again to take it off. Right-click for a closer look. Skins only change how things look. Press Apply when you are done.'));
 		var grid = el('div', 'grid');
 		list.appendChild(grid);
 		function fill() {
@@ -2161,7 +2161,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 		wear.onclick = function () { toggleSkin(s); wear.textContent = curSkins()[s.group] === s.id ? 'Take Off' : 'Wear'; if (onChange) onChange(); };
 		done.onclick = function () { closeCard(); };
 		foot.style.gap = '8px'; foot.appendChild(wear); foot.appendChild(done); card.appendChild(foot);
-		card.appendChild(el('div', 'rs', 'Skins apply after Apply & Restart.'));
+		card.appendChild(el('div', 'rs', 'Skins are applied when you press Apply.'));
 		bg.appendChild(card);
 		bg.addEventListener('mousedown', function (e) { if (e.target === bg) closeCard(); });
 		bg.addEventListener('contextmenu', function (e) { e.preventDefault(); });
@@ -2253,7 +2253,7 @@ var TeaVM=TeaVM||{};TeaVM.wasmGC=TeaVM.wasmGC||(()=>{let n=new Map;let e=null;le
 			add(Object.assign({}, it, { label: it.type === 'actions' ? 'Run' : 'Value' }));
 		}
 		(it.opts || []).forEach(add);
-		if (it.restart || it.key || (it.opts || []).some(function (o) { return o.restart; })) card.appendChild(el('div', 'rs', 'Some of this applies after a restart (press Apply & Restart).'));
+		if (it.restart || it.key || (it.opts || []).some(function (o) { return o.restart; })) card.appendChild(el('div', 'rs', 'This option is staged until Apply.'));
 		var foot = el('div', 'foot'), done = el('div', 'btn small', 'Done');
 		done.onclick = function () { closeCard(); };
 		foot.appendChild(done); card.appendChild(foot);
